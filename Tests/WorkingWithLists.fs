@@ -1,0 +1,101 @@
+module Tests.WorkingWithLists
+
+open System
+open Xunit
+open Tests.Helper
+
+[<Fact>]
+let ``Write a function last : 'a list -> 'a option that returns the last element of a list`` () =
+
+    let rec last = function
+        | [] -> None
+        | [ x ] -> Some x
+        | _ :: x -> last x
+
+    last [ "a" ; "b" ; "c" ; "d" ] =?= Some "d"
+    last [ ] =?= None
+
+[<Fact>]
+let ``Find the last but one (last and penultimate) elements of a list`` () =
+    let rec last_two = function
+        | [] | [ _ ] -> None
+        | [ x; y ] -> Some (x, y)
+        | _ :: x -> last_two x
+
+    last_two [ "a" ; "b" ; "c" ; "d" ] =?= Some ("c", "d")
+    last_two [ "a" ] =?= None
+
+[<Fact>]
+let ``Find the k'th element of a list.`` () =
+    let rec at i l =
+        match i, l with
+        | _, _ when i < 1 -> None
+        | _, [ ] -> None
+        | 1, h :: t -> Some h
+        | i, h :: t -> at (i - 1) t
+
+    at 3 [ "a" ; "b"; "c"; "d"; "e" ] =?= Some "c"
+    at 3 [ "a" ] =?= None 
+
+[<Fact>]
+let ``Find the number of elements of a list`` () =
+    let length = 
+        let rec helper i = function
+            | [ ] -> i
+            | _ :: t -> helper (i + 1) t
+        helper 0
+
+    length [ "a" ; "b" ; "c"] =?= 3
+    length [] =?= 0
+
+
+[<Fact>]
+let ``Reverse a list`` () =
+    let rev = 
+       let rec helper s = function
+           | [ ] -> s
+           | h :: t -> helper (h :: s) t
+       helper []  
+         
+    rev ["a" ; "b" ; "c"] =?= ["c"; "b"; "a"]
+
+[<Fact>]
+let ``Find out whether a list is a palindrome`` () =
+    let is_palindrome l = List.rev l = l
+
+    is_palindrome [ "x" ; "a" ; "m" ; "a" ; "x" ] =?= true
+    not (is_palindrome [ "a" ; "b" ]) =?= true
+
+type 'a Node =
+        | One of 'a 
+        | Many of 'a Node list
+
+[<Fact>]
+let ``Flatten a nested list structure`` () =
+    let flatten l =
+        let rec helper s = function
+            | [ ] -> s
+            | One x :: t -> helper (x :: s) t
+            | Many x :: t -> helper (helper s x) t
+        helper [ ] l |> List.rev
+    flatten [ One "a" ; Many [ One "b" ; Many [ One "c" ; One "d" ] ; One "e" ] ] =?= ["a"; "b"; "c"; "d"; "e"]
+
+
+[<Fact>]
+let ``Eliminate consecutive duplicates of list elements.`` () =
+    let rec compress list =
+        // let rec helper s last l = 
+        //     match last, l with
+        //     | _, [] -> s
+        //     | None, h :: t -> helper (h :: s) (Some h) t
+        //     | Some x, h :: t when x = h -> helper s (Some h) t
+        //     | _, h :: t -> helper (h :: s) (Some h) t
+        // helper [] None list |> List.rev
+        match list with
+        | a :: (b :: _ as t) ->
+            if a = b then compress t else a :: compress t
+        | x -> x
+    compress ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] =?= ["a"; "b"; "c"; "a"; "d"; "e"]
+
+    
+
