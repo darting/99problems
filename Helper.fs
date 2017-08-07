@@ -2,7 +2,10 @@ module Tests.Helper
 
 open Xunit
 
-let equal<'T> (a : 'T) (b : 'T) = Assert.Equal (b, a)
+let equal<'T when 'T : equality> (a : 'T) (b : 'T) = 
+    // Assert.Equal (b, a)
+    if a = b then ()
+    else failwithf "\r\n Expected: %A \r\n Actual: %A" b a
 
 let notEqual<'T> (a : 'T) (b : 'T) = Assert.NotEqual (b, a)
 

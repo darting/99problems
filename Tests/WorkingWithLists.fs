@@ -48,7 +48,6 @@ let ``Find the number of elements of a list`` () =
     length [ "a" ; "b" ; "c"] =?= 3
     length [] =?= 0
 
-
 [<Fact>]
 let ``Reverse a list`` () =
     let rev = 
@@ -71,7 +70,7 @@ type 'a Node =
         | Many of 'a Node list
 
 [<Fact>]
-let ``Flatten a nested list structure`` () =
+let ``Flatten a nested list structure. (medium)`` () =
     let flatten l =
         let rec helper s = function
             | [ ] -> s
@@ -80,9 +79,8 @@ let ``Flatten a nested list structure`` () =
         helper [ ] l |> List.rev
     flatten [ One "a" ; Many [ One "b" ; Many [ One "c" ; One "d" ] ; One "e" ] ] =?= ["a"; "b"; "c"; "d"; "e"]
 
-
 [<Fact>]
-let ``Eliminate consecutive duplicates of list elements.`` () =
+let ``Eliminate consecutive duplicates of list elements. (medium)`` () =
     let rec compress list =
         // let rec helper s last l = 
         //     match last, l with
@@ -96,6 +94,34 @@ let ``Eliminate consecutive duplicates of list elements.`` () =
             if a = b then compress t else a :: compress t
         | x -> x
     compress ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] =?= ["a"; "b"; "c"; "a"; "d"; "e"]
-
     
+[<Fact>]
+let ``Pack consecutive duplicates of list elements into sublists. (medium)`` () =
+    let pack = 
+        let rec helper s g = function
+            | a :: (b :: _ as t) -> 
+                if a = b then helper s (a :: g) t else helper ((a :: g) :: s) [] t
+            | [ x ] -> helper ((x :: g) :: s ) [] []
+            | [] -> List.rev s
+        helper [] []
 
+    pack ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"d";"e";"e";"e";"e"] =?= 
+         [["a"; "a"; "a"; "a"]; ["b"]; ["c"; "c"]; ["a"; "a"]; ["d"; "d"]; ["e"; "e"; "e"; "e"]]
+    pack [] =?= []
+    pack ["a"] =?= [["a"]]
+    pack ["a"; "b"] =?= [["a"]; ["b"]]
+    pack ["a"; "a"; "b"] =?= [["a"; "a"]; ["b"]]
+    pack ["a"; "a"; "a"] =?= [["a"; "a"; "a"]]
+    
+[<Fact>]    
+let ``Run-length encoding of a list. (easy)`` () =
+    let encode = 
+        let rec helper s i = function
+            | [] -> []
+            | [ x ] -> (i + 1, x) :: s |> List.rev
+            | (a :: (b :: _ as t)) ->
+                if a = b then helper s (i + 1) t else helper ((i + 1, a) :: s) 0 t
+        helper [] 0
+
+    encode ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] =?=
+            [(4, "a"); (1, "b"); (2, "c"); (2, "a"); (1, "d"); (4, "e")]
