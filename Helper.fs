@@ -9,9 +9,9 @@ let equal<'T when 'T : equality> (a : 'T) (b : 'T) =
 
 let notEqual<'T> (a : 'T) (b : 'T) = Assert.NotEqual (b, a)
 
-let (=?=) a b = equal a b
+let (<==>) a b = equal a b
 
-let (=/=) a b = notEqual (b, a)
+let (<!=>) a b = notEqual (b, a)
 
 let isTrue (x : bool) = Assert.True x
 

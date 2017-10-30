@@ -12,8 +12,8 @@ let ``Write a function last : 'a list -> 'a option that returns the last element
         | [ x ] -> Some x
         | _ :: x -> last x
 
-    last [ "a" ; "b" ; "c" ; "d" ] =?= Some "d"
-    last [ ] =?= None
+    last [ "a" ; "b" ; "c" ; "d" ] <==> Some "d"
+    last [ ] <==> None
 
 [<Fact>]
 let ``Find the last but one (last and penultimate) elements of a list`` () =
@@ -22,8 +22,8 @@ let ``Find the last but one (last and penultimate) elements of a list`` () =
         | [ x; y ] -> Some (x, y)
         | _ :: x -> last_two x
 
-    last_two [ "a" ; "b" ; "c" ; "d" ] =?= Some ("c", "d")
-    last_two [ "a" ] =?= None
+    last_two [ "a" ; "b" ; "c" ; "d" ] <==> Some ("c", "d")
+    last_two [ "a" ] <==> None
 
 [<Fact>]
 let ``Find the k'th element of a list.`` () =
@@ -34,8 +34,8 @@ let ``Find the k'th element of a list.`` () =
         | 1, h :: t -> Some h
         | i, h :: t -> at (i - 1) t
 
-    at 3 [ "a" ; "b"; "c"; "d"; "e" ] =?= Some "c"
-    at 3 [ "a" ] =?= None 
+    at 3 [ "a" ; "b"; "c"; "d"; "e" ] <==> Some "c"
+    at 3 [ "a" ] <==> None 
 
 [<Fact>]
 let ``Find the number of elements of a list`` () =
@@ -45,8 +45,8 @@ let ``Find the number of elements of a list`` () =
             | _ :: t -> helper (i + 1) t
         helper 0
 
-    length [ "a" ; "b" ; "c"] =?= 3
-    length [] =?= 0
+    length [ "a" ; "b" ; "c"] <==> 3
+    length [] <==> 0
 
 [<Fact>]
 let ``Reverse a list`` () =
@@ -56,14 +56,14 @@ let ``Reverse a list`` () =
            | h :: t -> helper (h :: s) t
        helper []  
          
-    rev ["a" ; "b" ; "c"] =?= ["c"; "b"; "a"]
+    rev ["a" ; "b" ; "c"] <==> ["c"; "b"; "a"]
 
 [<Fact>]
 let ``Find out whether a list is a palindrome`` () =
     let is_palindrome l = List.rev l = l
 
-    is_palindrome [ "x" ; "a" ; "m" ; "a" ; "x" ] =?= true
-    not (is_palindrome [ "a" ; "b" ]) =?= true
+    is_palindrome [ "x" ; "a" ; "m" ; "a" ; "x" ] <==> true
+    not (is_palindrome [ "a" ; "b" ]) <==> true
 
 type 'a Node =
         | One of 'a 
@@ -77,7 +77,7 @@ let ``Flatten a nested list structure. (medium)`` () =
             | One x :: t -> helper (x :: s) t
             | Many x :: t -> helper (helper s x) t
         helper [ ] l |> List.rev
-    flatten [ One "a" ; Many [ One "b" ; Many [ One "c" ; One "d" ] ; One "e" ] ] =?= ["a"; "b"; "c"; "d"; "e"]
+    flatten [ One "a" ; Many [ One "b" ; Many [ One "c" ; One "d" ] ; One "e" ] ] <==> ["a"; "b"; "c"; "d"; "e"]
 
 [<Fact>]
 let ``Eliminate consecutive duplicates of list elements. (medium)`` () =
@@ -93,7 +93,7 @@ let ``Eliminate consecutive duplicates of list elements. (medium)`` () =
         | a :: (b :: _ as t) ->
             if a = b then compress t else a :: compress t
         | x -> x
-    compress ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] =?= ["a"; "b"; "c"; "a"; "d"; "e"]
+    compress ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] <==> ["a"; "b"; "c"; "a"; "d"; "e"]
     
 [<Fact>]
 let ``Pack consecutive duplicates of list elements into sublists. (medium)`` () =
@@ -105,13 +105,13 @@ let ``Pack consecutive duplicates of list elements into sublists. (medium)`` () 
             | [] -> List.rev s
         helper [] []
 
-    pack ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"d";"e";"e";"e";"e"] =?= 
+    pack ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"d";"e";"e";"e";"e"] <==> 
          [["a"; "a"; "a"; "a"]; ["b"]; ["c"; "c"]; ["a"; "a"]; ["d"; "d"]; ["e"; "e"; "e"; "e"]]
-    pack [] =?= []
-    pack ["a"] =?= [["a"]]
-    pack ["a"; "b"] =?= [["a"]; ["b"]]
-    pack ["a"; "a"; "b"] =?= [["a"; "a"]; ["b"]]
-    pack ["a"; "a"; "a"] =?= [["a"; "a"; "a"]]
+    pack [] <==> []
+    pack ["a"] <==> [["a"]]
+    pack ["a"; "b"] <==> [["a"]; ["b"]]
+    pack ["a"; "a"; "b"] <==> [["a"; "a"]; ["b"]]
+    pack ["a"; "a"; "a"] <==> [["a"; "a"; "a"]]
     
 [<Fact>]    
 let ``Run-length encoding of a list. (easy)`` () =
@@ -123,5 +123,5 @@ let ``Run-length encoding of a list. (easy)`` () =
                 if a = b then helper s (i + 1) t else helper ((i + 1, a) :: s) 0 t
         helper [] 0
 
-    encode ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] =?=
+    encode ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] <==>
             [(4, "a"); (1, "b"); (2, "c"); (2, "a"); (1, "d"); (4, "e")]
