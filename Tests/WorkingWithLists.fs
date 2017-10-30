@@ -125,3 +125,35 @@ let ``Run-length encoding of a list. (easy)`` () =
 
     encode ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"] <==>
             [(4, "a"); (1, "b"); (2, "c"); (2, "a"); (1, "d"); (4, "e")]
+
+type 'a Rle = 
+    | One of 'a
+    | Many of int * 'a
+
+[<Fact>]
+let ``11. Modified run-length encoding. (easy)`` () =
+    let encode src = 
+        let rec helper s i = function
+            | [] -> []
+            | [ x ] -> (i + 1, x) :: s |> List.rev
+            | (a :: (b :: _ as t)) ->
+                if a = b then helper s (i + 1) t else helper ((i + 1, a) :: s) 0 t
+        src
+        |> helper [] 0
+        |> List.map (fun (a, b) -> if a > 1 then Many (a, b) else One b )
+        
+    encode ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"]
+    <==> [ Many (4, "a"); One "b"; Many (2, "c"); Many (2, "a"); One "d";Many (4, "e") ]
+
+[<Fact>]
+let ``12. Decode a run-length encoded list. (medium)`` () =
+    let rec decode = function
+        | [] -> []
+        | x :: xs -> 
+            match x with
+            | Many (a, b) -> (List.replicate a b) @ decode xs
+            | One a -> a :: decode xs
+    decode [Many (4,"a"); One "b"; Many (2,"c"); Many (2,"a"); One "d"; Many (4,"e")] 
+    <==> ["a"; "a"; "a"; "a"; "b"; "c"; "c"; "a"; "a"; "d"; "e"; "e"; "e"; "e"]
+
+[
